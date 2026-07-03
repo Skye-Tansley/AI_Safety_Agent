@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom'
 import './App.css'
 import AiInsightsPage from './pages/AiInsightsPage'
@@ -7,6 +7,8 @@ import ControlHealthPage from './pages/ControlHealthPage'
 import IndividualRiskDetailPage from './pages/IndividualRiskDetailPage'
 import OverviewPage from './pages/OverviewPage'
 import RiskDetailsOverviewPage from './pages/RiskDetailsOverviewPage'
+import CcvsAssurancePlanningPage from './pages/CcvsAssurancePlanningPage'
+import SuperintendentLeadershipInFieldPage from './pages/SuperintendentLeadershipInFieldPage'
 
 import {
   areaOptionsBySite,
@@ -38,8 +40,8 @@ function App() {
   const location = useLocation()
   const [filters, setFilters] = useState<DashboardState>(initialState)
   const [activeNav, setActiveNav] = useState('Overview')
-  const [selectedRiskId, setSelectedRiskId] = useState<string | undefined>(undefined)
-  const [selectedInsightId, setSelectedInsightId] = useState<string | undefined>(undefined)
+  const [, setSelectedRiskId] = useState<string | undefined>(undefined)
+  const [selectedInsightId] = useState<string | undefined>(undefined)
   const [drawer, setDrawer] = useState<DrawerState>({ type: 'none' })
   const [toast, setToast] = useState<string | null>(null)
   const [aiOpen, setAiOpen] = useState(false)
@@ -51,6 +53,48 @@ function App() {
       text: 'Focus on vehicle interaction risk and traffic separation controls. The current signal is strongest in Load & Haul and contractor road movements.',
     },
   ])
+
+  // Role management
+  type Role = 'general-manager' | 'manager' | 'superintendent' | 'supervisor'
+  const roleFromStorage = ((): Role => {
+    try {
+      const raw = localStorage.getItem('asa_role')
+      if (!raw) return 'general-manager'
+      return raw as Role
+    } catch {
+      return 'general-manager'
+    }
+  })()
+  const [role, setRole] = useState<Role>(roleFromStorage)
+  const [roleDropdownOpen, setRoleDropdownOpen] = useState(false)
+  const roleDropdownRef = useRef<HTMLDivElement | null>(null)
+
+  const sidebarNavItems = useMemo(() => {
+    if (role === 'general-manager') {
+      return ['Overview', 'AI Insights', 'Risk Detail', 'Control Health', 'Assurance', 'Field Priorities', 'Shift Guidance', 'Alerts']
+    }
+    if (role === 'manager') {
+      return ['CCVS Assurance Planning']
+    }
+    if (role === 'superintendent') {
+      return ['CCVS Assurance Planning', 'Leadership in the Field']
+    }
+    return ['Coming Soon']
+  }, [role])
+
+  useEffect(() => {
+    try { localStorage.setItem('asa_role', role) } catch {}
+  }, [role])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (roleDropdownRef.current && !roleDropdownRef.current.contains(event.target as Node)) {
+        setRoleDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   useEffect(() => {
     if (!toast) return
@@ -102,35 +146,24 @@ function App() {
   }, [filters])
 
   const showToast = (label: string) => setToast(label)
+  const roleLabel = role === 'general-manager' ? 'General Manager' : role === 'manager' ? 'Manager' : role === 'superintendent' ? 'Superintendent' : 'Supervisor'
+  const roleInitials = role === 'general-manager' ? 'GM' : role === 'manager' ? 'MGR' : role === 'superintendent' ? 'SupT' : 'SupV'
 
-  const handleNav = (item: string) => {
-    setActiveNav(item)
-    if (item === 'Overview') {
-      navigate('/')
-      return
-    }
-    if (item === 'AI Insights') {
-      setSelectedInsightId(undefined)
-      navigate('/insights')
-      setToast('Navigated to AI Insights')
-      return
-    }
-    if (item === 'Risk Detail') {
-      navigate('/risk-detail')
-      setToast('Navigated to Risk Detail')
-      return
-    }
-    if (item === 'Control Health') {
-      navigate('/control-health')
-      setToast('Navigated to Control Health')
-      return
-    }
-    if (item === 'Assurance') {
-      navigate('/assurance')
-      setToast('Navigated to Assurance Oversight')
-      return
-    }
-    showToast('This page will be added in the next prototype step')
+  const drawerContext = (() => {
+    const path = location.pathname
+    if (path === '/supervisor') return `Context: ${roleLabel} | Placeholder view`
+    if (path.includes('/ccvs-assurance-planning')) return `Context: ${roleLabel} | CCVS Assurance Planning | selected site | selected department | selected team | selected month`
+    if (path.includes('/leadership-in-field')) return `Context: ${roleLabel} | Leadership in the Field | selected site | selected department | selected team | selected month`
+    return `Context: ${roleLabel} | ${activeNav} | ${siteLabel} | ${areaLabel} | ${timeframeLabel} | ${riskLensLabel}`
+  })()
+
+  const handleRoleSelect = (newRole: Role) => {
+    setRoleDropdownOpen(false)
+    setRole(newRole)
+    if (newRole === 'general-manager') navigate('/overview')
+    else if (newRole === 'superintendent') navigate('/superintendent/ccvs-assurance-planning')
+    else if (newRole === 'manager') navigate('/manager/ccvs-assurance-planning')
+    else if (newRole === 'supervisor') navigate('/supervisor')
   }
 
   const promptAi = (question: string) => {
@@ -168,12 +201,32 @@ function App() {
       setActiveNav('Control Health')
     } else if (path === '/assurance') {
       setActiveNav('Assurance')
+    } else if (path.includes('/ccvs-assurance-planning')) {
+      setActiveNav('CCVS Assurance Planning')
+    } else if (path.includes('/leadership-in-field')) {
+      setActiveNav('Leadership in the Field')
+    } else if (path === '/supervisor') {
+      setActiveNav('Supervisor')
     } else {
       setActiveNav('Overview')
     }
   }, [location.pathname])
 
   const renderMainContent = () => {
+    const path = location.pathname
+    if (path === '/supervisor') {
+      return (
+        <div className="placeholder-page">
+          <h1>Supervisor view will be added in a later prototype step.</h1>
+        </div>
+      )
+    }
+    if (path.includes('/ccvs-assurance-planning')) {
+      return <CcvsAssurancePlanningPage />
+    }
+    if (path.includes('/leadership-in-field')) {
+      return <SuperintendentLeadershipInFieldPage />
+    }
     if (activeNav === 'AI Insights') {
       return (
         <AiInsightsPage
@@ -247,26 +300,33 @@ function App() {
         </div>
 
         <nav className="sidebar-nav" aria-label="Primary">
-          {[
-            'Overview',
-            'AI Insights',
-            'Risk Detail',
-            'Control Health',
-            'Assurance',
-            'Field Priorities',
-            'Shift Guidance',
-            'Alerts',
-          ].map((item) => {
-            const isActive = item === activeNav
-            const disabledSet = new Set(['Field Priorities', 'Shift Guidance', 'Alerts'])
-            const isDisabled = disabledSet.has(item)
+          {sidebarNavItems.map((item) => {
+            const isActive = item === activeNav || (item === 'CCVS Assurance Planning' && location.pathname.includes('/ccvs-assurance-planning')) || (item === 'Leadership in the Field' && location.pathname.includes('/leadership-in-field'))
             return (
               <button
                 key={item}
                 type="button"
-                className={`nav-item ${isActive ? 'active' : ''} ${isDisabled ? 'disabled' : ''}`}
-                onClick={() => handleNav(item)}
-                disabled={isDisabled}
+                className={`nav-item ${isActive ? 'active' : ''}`}
+                onClick={() => {
+                  if (item === 'CCVS Assurance Planning') {
+                    if (role === 'superintendent') navigate('/superintendent/ccvs-assurance-planning')
+                    else if (role === 'manager') navigate('/manager/ccvs-assurance-planning')
+                    setActiveNav('CCVS Assurance Planning')
+                    return
+                  }
+                  if (item === 'Leadership in the Field') {
+                    navigate('/superintendent/leadership-in-field')
+                    setActiveNav('Leadership in the Field')
+                    return
+                  }
+                  if (item === 'Overview') { setActiveNav('Overview'); navigate('/overview'); return }
+                  if (item === 'AI Insights') { setActiveNav('AI Insights'); navigate('/insights'); return }
+                  if (item === 'Risk Detail') { setActiveNav('Risk Detail'); navigate('/risk-detail'); return }
+                  if (item === 'Control Health') { setActiveNav('Control Health'); navigate('/control-health'); return }
+                  if (item === 'Assurance') { setActiveNav('Assurance'); navigate('/assurance'); return }
+                  if (item === 'Coming Soon') { showToast('Supervisor view will be added in a later prototype step.'); return }
+                  showToast('This page will be added in the next prototype step')
+                }}
               >
                 {item}
               </button>
@@ -275,10 +335,10 @@ function App() {
         </nav>
 
         <div className="sidebar-user">
-          <div className="avatar">GM</div>
+          <div className="avatar">{roleInitials}</div>
           <div>
-            <div className="user-name">General Manager</div>
-            <div className="user-role">Pilbara operations</div>
+            <div className="user-name">{roleLabel}</div>
+            <div className="user-role">{role === 'general-manager' ? 'Pilbara Operations' : role === 'manager' ? 'Mine Operations / Site A' : role === 'superintendent' ? 'Mine Operations / Site A' : 'Shift Execution / Site A'}</div>
           </div>
         </div>
       </aside>
@@ -291,6 +351,35 @@ function App() {
             <p className="hero-subtitle">{activeNav === 'Overview' ? 'General Manager view across Pilbara safety risk, controls and assurance' : activeNav === 'AI Insights' ? 'General Manager view of current and emerging safety signals across Pilbara operations' : activeNav === 'Risk Detail' ? 'General Manager deep-dive into risk drivers, control health, evidence signals and assurance coverage' : activeNav === 'Control Health' ? 'General Manager view of critical control performance across selected Pilbara operations' : activeNav === 'Assurance' ? 'General Manager view of whether assurance activity is aligned to current and emerging risk' : ''}</p>
           </div>
           <div className="topbar-actions">
+            <div className="role-dropdown-wrapper" ref={roleDropdownRef}>
+              <button
+                type="button"
+                className={`role-dropdown ${roleDropdownOpen ? 'open' : ''}`}
+                onClick={() => setRoleDropdownOpen((prev) => !prev)}
+                aria-haspopup="true"
+                aria-expanded={roleDropdownOpen}
+              >
+                {roleLabel}
+                <span className="chevron">▾</span>
+              </button>
+              {roleDropdownOpen && (
+                <div className="role-dropdown-menu" role="menu">
+                  {['general-manager', 'manager', 'superintendent', 'supervisor'].map((value) => {
+                    const label = value === 'general-manager' ? 'General Manager' : value === 'manager' ? 'Manager' : value === 'superintendent' ? 'Superintendent' : 'Supervisor'
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        className={`role-dropdown-item ${role === value ? 'selected' : ''}`}
+                        onClick={() => handleRoleSelect(value as Role)}
+                      >
+                        {label}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
             <div className="icon-button-wrap">
               <button
                 type="button"
@@ -419,7 +508,7 @@ function App() {
             Close
           </button>
         </div>
-        <p className="drawer-context">Context: General Manager | {activeNav === 'AI Insights' ? 'AI Insights' : activeNav === 'Risk Detail' && selectedRiskId ? `Risk Detail | ${selectedRiskId}` : activeNav} | {siteLabel} | {areaLabel} | {timeframeLabel} | {riskLensLabel}</p>
+        <p className="drawer-context">{drawerContext}</p>
         <div className="prompt-list">
           {[
             'What should I focus on this week?',
