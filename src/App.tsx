@@ -149,6 +149,8 @@ function App() {
   const roleLabel = role === 'general-manager' ? 'General Manager' : role === 'manager' ? 'Manager' : role === 'superintendent' ? 'Superintendent' : 'Supervisor'
   const roleInitials = role === 'general-manager' ? 'GM' : role === 'manager' ? 'MGR' : role === 'superintendent' ? 'SupT' : 'SupV'
 
+  const isCcvsPage = location.pathname.includes('/ccvs-assurance-planning')
+
   const drawerContext = (() => {
     const path = location.pathname
     if (path === '/supervisor') return `Context: ${roleLabel} | Placeholder view`
@@ -345,10 +347,12 @@ function App() {
 
       <main className="main-panel">
         <header className="topbar">
-          <div>
-            <p className="eyebrow">{activeNav}</p>
-            <h1>{activeNav === 'Overview' ? 'General Manager Overview Dashboard' : activeNav === 'AI Insights' ? 'AI Insights' : activeNav === 'Risk Detail' ? 'Risk Details' : activeNav === 'Control Health' ? 'Control Health Dashboard' : activeNav === 'Assurance' ? 'Assurance Oversight' : activeNav}</h1>
-            <p className="hero-subtitle">{activeNav === 'Overview' ? 'General Manager view across Pilbara safety risk, controls and assurance' : activeNav === 'AI Insights' ? 'General Manager view of current and emerging safety signals across Pilbara operations' : activeNav === 'Risk Detail' ? 'General Manager deep-dive into risk drivers, control health, evidence signals and assurance coverage' : activeNav === 'Control Health' ? 'General Manager view of critical control performance across selected Pilbara operations' : activeNav === 'Assurance' ? 'General Manager view of whether assurance activity is aligned to current and emerging risk' : ''}</p>
+          <div className="topbar-brand-row">
+            <div className="brand-square" aria-hidden="true" />
+            <div>
+              <p className="topbar-app-label">Rio Tinto</p>
+              <h1>Safety AI Agent</h1>
+            </div>
           </div>
           <div className="topbar-actions">
             <div className="role-dropdown-wrapper" ref={roleDropdownRef}>
@@ -431,68 +435,70 @@ function App() {
           </div>
         )}
 
-        <section className="filter-bar" aria-label="Dashboard filters">
-          <label className="filter-control">
-            <span>Site</span>
-            <select value={filters.site} onChange={(event) => setFilters((prev) => ({ ...prev, site: event.target.value, area: 'all' }))}>
-              {siteOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+        {!isCcvsPage && (
+          <section className="filter-bar" aria-label="Dashboard filters">
+            <label className="filter-control">
+              <span>Site</span>
+              <select value={filters.site} onChange={(event) => setFilters((prev) => ({ ...prev, site: event.target.value, area: 'all' }))}>
+                {siteOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <label className="filter-control">
-            <span>Area</span>
-            <select value={filters.area} onChange={(event) => setFilters((prev) => ({ ...prev, area: event.target.value }))}>
-              {availableAreas.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label className="filter-control">
+              <span>Area</span>
+              <select value={filters.area} onChange={(event) => setFilters((prev) => ({ ...prev, area: event.target.value }))}>
+                {availableAreas.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <div className="filter-control timeframe-block">
-            <span>Timeframe</span>
-            <div className="timeframe-row">
-              {timeframeOptions.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  className={`pill ${filters.timeframe === option.value ? 'active' : ''}`}
-                  onClick={() => setFilters((prev) => ({ ...prev, timeframe: option.value }))}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-            {filters.timeframe === 'custom' && (
-              <div className="date-row">
-                <label>
-                  <span>From</span>
-                  <input type="date" value={filters.customFrom} onChange={(event) => setFilters((prev) => ({ ...prev, customFrom: event.target.value }))} />
-                </label>
-                <label>
-                  <span>To</span>
-                  <input type="date" value={filters.customTo} onChange={(event) => setFilters((prev) => ({ ...prev, customTo: event.target.value }))} />
-                </label>
+            <div className="filter-control timeframe-block">
+              <span>Timeframe</span>
+              <div className="timeframe-row">
+                {timeframeOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={`pill ${filters.timeframe === option.value ? 'active' : ''}`}
+                    onClick={() => setFilters((prev) => ({ ...prev, timeframe: option.value }))}
+                  >
+                    {option.label}
+                  </button>
+                ))}
               </div>
-            )}
-          </div>
+              {filters.timeframe === 'custom' && (
+                <div className="date-row">
+                  <label>
+                    <span>From</span>
+                    <input type="date" value={filters.customFrom} onChange={(event) => setFilters((prev) => ({ ...prev, customFrom: event.target.value }))} />
+                  </label>
+                  <label>
+                    <span>To</span>
+                    <input type="date" value={filters.customTo} onChange={(event) => setFilters((prev) => ({ ...prev, customTo: event.target.value }))} />
+                  </label>
+                </div>
+              )}
+            </div>
 
-          <label className="filter-control">
-            <span>Risk lens</span>
-            <select value={filters.riskLens} onChange={(event) => setFilters((prev) => ({ ...prev, riskLens: event.target.value }))}>
-              {riskLensOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </section>
+            <label className="filter-control">
+              <span>Risk lens</span>
+              <select value={filters.riskLens} onChange={(event) => setFilters((prev) => ({ ...prev, riskLens: event.target.value }))}>
+                {riskLensOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </section>
+        )}
 
         {renderMainContent()}
 
