@@ -59,6 +59,14 @@ function createDemoData(filters: FilterState, role: 'superintendent' | 'supervis
   return { scope, location, seed, priorities: rotate(baseFocusRows).map((row, index) => [row[0], row[1], index === 0 ? location : row[2], `${row[3]} Filtered for ${scope}.`, row[4]]), lif: rotate(baseLifRows).map((row, index) => [row[0], row[1], index === 0 ? location : row[2], `${row[3]} Focused on ${scope}.`]), fatal: [['Controls Requiring Attention', String(7 + seed % 12), `${2 + seed % 6} since last month`], ['Emerging Risks', String(1 + seed % 5), `${1 + seed % 3} New • ${seed % 2 + 1} Escalating`], ['AI Focus Areas', String(2 + seed % 3), `${1 + seed % 2} High • ${1 + seed % 2} Medium`]], lifKpis: [['Achieved LiF Interactions', String(46 + seed % 130), `${4 + seed % 18}%`], ['Quality Interactions', `${62 + seed % 27}%`, `${2 + seed % 9}%`], ['Team Members Reached', String(14 + seed % 58), `${3 + seed % 14}%`]] }
 }
 
+/** Shared lower-tile action. Add a tile to this pattern instead of recreating its button markup. */
+function configureTileFooter(button: HTMLButtonElement) {
+  button.className = 'tile-footer'
+  button.type = 'button'
+  button.dataset.action = 'show-insight-summary'
+  button.innerHTML = '<span>AI Summary</span><i>·</i><span>Learn more →</span>'
+}
+
 function App() {
   const [page, setPage] = useState<Page>('Fatality Prevention')
   const [plan, setPlan] = useState<'CCVS Plan' | 'CCFV Plan' | 'LIF Plan' | 'Team Focus'>('CCVS Plan')
@@ -143,6 +151,11 @@ function App() {
     if (page === 'Leadership in the Field' && role === 'superintendent') {
       const tiles = document.querySelector<HTMLElement>('.main-column .bottom-cards')
       if (tiles) tiles.innerHTML = `<section class="superintendent-lif-visuals"><article class="card lif-blank-tile"></article><article class="card superintendent-lif-tile"><h3>Team Activity Snapshot <small>(This Month) ⓘ</small></h3><div class="snapshot-list"><p><span>◇</span>LiF Interactions Completed <b>142</b><i>↑ 18%</i></p><p><span>◉</span>Quality Interactions <b>74%</b><i>↑ 6%</i></p><p><span>♙</span>Leaders Reached <b>14</b><i>↑ 8%</i></p><p><span>▧</span>Team Members Reached <b>56</b><i>↑ 12%</i></p><p><span>⌁</span>Avg. LiF per Supervisor <b>18</b><i>↑ 5%</i></p></div><button>AI Summary　 ·　 Learn more →</button></article><article class="card superintendent-lif-tile"><h3>Top LiF Themes <small>(This Month) ⓘ</small></h3><div class="super-theme-list"><p><span>Safety Fundamentals</span><b style="width:100%"></b><strong>32</strong><i>↑</i></p><p><span>Risk Awareness</span><b style="width:75%"></b><strong>24</strong><i>↑</i></p><p><span>PPE Compliance</span><b style="width:50%"></b><strong>16</strong><i class="down">↓</i></p><p><span>Line of Fire</span><b style="width:35%"></b><strong>11</strong><i>↑</i></p><p><span>Hazard Reporting</span><b style="width:29%"></b><strong>9</strong><i>↑</i></p><p><span>Work Zone Safety</span><b style="width:25%"></b><strong>8</strong><i class="down">↓</i></p><p><span>Other</span><b style="width:19%"></b><strong>6</strong><i>–</i></p></div><button>AI Summary　 ·　 Learn more →</button></article></section>`
+    }
+    if (page === 'Leadership in the Field' && role === 'superintendent') {
+      const emergingTile = document.querySelector<HTMLElement>('.lif-blank-tile')
+      if (emergingTile) emergingTile.innerHTML = `<div class="emerging-heading"><h3>Emerging Behavioural Themes <small>(This Month) ⓘ</small></h3><small>Early signals to coach in the field</small></div><div class="emerging-mini-row violet"><span>♧</span><div><b>Glove Compliance</b><small>Gloves not worn during maintenance</small></div><em>Workshop<br/>Fixed Plant</em><strong>↑ 18%</strong></div><div class="emerging-mini-row orange"><span>♙</span><div><b>Line of Fire Awareness</b><small>Exclusion-zone controls not followed</small></div><em>ROM Pad<br/>Crushing Plant</em><strong>↑ 14%</strong></div><div class="emerging-mini-row teal"><span>▧</span><div><b>PTHA Quality</b><small>Generic hazards and weak evidence</small></div><em>Processing Plant<br/>Maintenance</em><strong>↑ 11%</strong></div><div class="emerging-mini-row blue"><span>◌</span><div><b>Follow-up Conversations</b><small>Actions closed without verification</small></div><em>All Areas<br/>Multiple Teams</em><strong>↑ 8%</strong></div><button>AI Summary　 ·　 Learn more →</button>`
+      document.querySelectorAll<HTMLButtonElement>('.superintendent-lif-visuals button').forEach(configureTileFooter)
     }
     const member = filters.member
     const ccfvRows = Array.from(document.querySelectorAll<HTMLElement>('.ccfv-row'))
