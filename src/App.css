@@ -1296,10 +1296,6 @@ body[data-role="supervisor"] .product:after {
   font-weight: 500
 }
 
-body[data-role="supervisor"] .kpi {
-  border-top: 2px solid #e3231b
-}
-
 body[data-role="supervisor"] .focus-callout {
   background: #fff8f8
 }
@@ -1316,11 +1312,6 @@ body[data-role="supervisor"][data-page="Fatality Prevention"] .ccfv-head span:nt
   display: none
 }
 
-body[data-role="supervisor"][data-page="Fatality Prevention"] .plan h2 {
-  background: linear-gradient(90deg,#fff7f7,#fff);
-  color: #9d1712
-}
-
 body[data-role="supervisor"][data-page="Fatality Prevention"] .link-button:before {
   content: "4 CCFV activities recommended for your team";
   color: #6a7386;
@@ -1334,11 +1325,6 @@ body[data-role="supervisor"][data-page="Fatality Prevention"] .link-button {
 
 body[data-role="supervisor"][data-page="Leadership in the Field"] .tabs {
   display: none
-}
-
-body[data-role="supervisor"][data-page="Leadership in the Field"] .plan h2 {
-  background: linear-gradient(90deg,#fff7f7,#fff);
-  color: #9d1712
 }
 
 body[data-role="supervisor"][data-page="Leadership in the Field"] .lif-row {
@@ -1983,10 +1969,21 @@ body[data-page="Spotlight Recommendations"] .spotlight .bottom-cards,body[data-p
 }
 
 .alignment-key {
+  align-items: center;
   font-size: 7px;
   display: flex;
   gap: 7px;
   margin-bottom: 9px
+}
+
+/* Keep all legend items visually equal, including the optimal-alignment key. */
+.alignment-key span,.alignment-key i {
+  font-family: inherit;
+  font-size: 7px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .alignment-key span:first-child {
@@ -2020,7 +2017,8 @@ body[data-page="Spotlight Recommendations"] .spotlight .bottom-cards,body[data-p
 }
 
 .alignment-row>b i,.alignment-row>b em {
-  height: 3px;
+  display: block;
+  height: 4px;
   position: absolute;
   left: 0;
   border-radius: 2px
@@ -2032,8 +2030,10 @@ body[data-page="Spotlight Recommendations"] .spotlight .bottom-cards,body[data-p
 }
 
 .alignment-row>b em {
+  background: #10182f;
   bottom: 0;
-  background: #202c49
+  opacity: 1;
+  z-index: 1
 }
 
 .alignment-row strong {
