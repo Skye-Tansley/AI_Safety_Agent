@@ -243,6 +243,295 @@ main {
   margin-bottom: 17px
 }
 
+/* Fatality detail cards overlay the original KPI footprint to preserve table placement. */
+.main-column {
+  position: relative;
+}
+
+/* The reusable detail-card component owns the Fatality KPI footprint. */
+.main-column:has(.fatality-kpis)>.kpis:not(.fatality-kpis) {
+  visibility: hidden;
+}
+
+.fatality-kpis {
+  display: grid!important;
+  inset: 0 0 auto;
+  margin-bottom: 0;
+  pointer-events: auto;
+  position: absolute;
+  visibility: visible;
+  z-index: 2;
+}
+
+.fatality-kpis .fatality-kpi {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 142px;
+  min-height: 142px;
+  overflow: hidden;
+  padding: 13px 18px 8px;
+}
+
+.fatality-kpi__header {
+  border-bottom: 1px solid var(--line);
+  flex: 0 0 auto;
+  padding-bottom: 5px;
+  position: relative;
+}
+
+.fatality-kpi__header h3 i {
+  color: #68748a;
+  font-size: 10px;
+  font-style: normal;
+}
+
+.fatality-kpi__header strong {
+  font-size: 29px;
+  margin-top: 6px;
+}
+
+.fatality-kpi__header p {
+  font-size: 10px;
+  margin: 1px 0 0;
+}
+
+.fatality-kpi .kpi-icon {
+  font-size: 35px;
+  right: 3px;
+  top: 25px;
+}
+
+.fatality-kpi__details {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-color: #929cab transparent;
+  scrollbar-width: thin;
+}
+
+.fatality-kpi__item {
+  align-items: center;
+  border-bottom: 1px solid #edf0f4;
+  display: grid;
+  gap: 5px;
+  grid-template-columns: 7px 23px minmax(0,1fr) 10px;
+  min-height: 31px;
+  padding: 3px 0;
+}
+
+.fatality-kpi__item>i,.fatality-kpi__item>em {
+  color: var(--red);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.fatality-kpi__badge {
+  align-items: center;
+  background: #fff1f0;
+  border-radius: 5px;
+  color: var(--red);
+  display: inline-flex;
+  font-size: 9px;
+  height: 22px;
+  justify-content: center;
+  width: 22px;
+}
+
+.fatality-kpi__item span:last-of-type {
+  display: grid;
+  min-width: 0;
+}
+
+.fatality-kpi__item b {
+  color: var(--ink);
+  font-size: 9px;
+  line-height: 1.1;
+}
+
+.fatality-kpi__item small {
+  color: #58647a;
+  font-size: 8px;
+  line-height: 1.1;
+}
+
+.fatality-kpi__item--green>i,
+.fatality-kpi__item--green .fatality-kpi__badge {
+  color: #138a5b;
+}
+
+.fatality-kpi__item--green .fatality-kpi__badge {
+  background: #eaf8f1;
+}
+
+.fatality-kpi__item--orange>i,
+.fatality-kpi__item--orange>em,
+.fatality-kpi__item--orange .fatality-kpi__badge {
+  color: #e97615;
+}
+
+.fatality-kpi__item--orange .fatality-kpi__badge {
+  background: #fff3e9;
+}
+
+.fatality-kpi__item--yellow>i,
+.fatality-kpi__item--yellow>em,
+.fatality-kpi__item--yellow .fatality-kpi__badge {
+  color: #c48b00;
+}
+
+.fatality-kpi__item--yellow .fatality-kpi__badge {
+  background: #fff9e8;
+}
+
+.fatality-kpi__footer {
+  border-top: 1px solid var(--line);
+  color: var(--green);
+  flex: 0 0 auto;
+  font-size: 9px;
+  font-weight: 800;
+  padding-top: 5px;
+}
+
+/* First-stage detailed Fatality KPI: scroll inside the existing Controls card only. */
+.controls-detail-kpi {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 142px;
+  min-height: 142px;
+  overflow: hidden;
+  padding: 13px 18px 8px;
+}
+
+.controls-detail-kpi h3 i {
+  color: #68748a;
+  font-size: 10px;
+  font-style: normal;
+}
+
+.controls-detail-kpi>strong {
+  font-size: 29px;
+  margin-top: 6px;
+}
+
+.controls-detail-kpi>p {
+  border-bottom: 1px solid var(--line);
+  font-size: 10px;
+  margin: 1px 0 0;
+  padding-bottom: 5px;
+}
+
+.controls-detail-kpi .kpi-icon {
+  font-size: 35px;
+  right: 3px;
+  top: 25px;
+}
+
+.controls-detail-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-color: #929cab transparent;
+  scrollbar-width: thin;
+}
+
+.controls-detail-row {
+  align-items: center;
+  border-bottom: 1px solid #edf0f4;
+  display: grid;
+  gap: 5px;
+  grid-template-columns: 7px 23px minmax(0, 1fr) 10px;
+  min-height: 31px;
+  padding: 3px 0;
+}
+
+.controls-detail-row>i,
+.controls-detail-row>em {
+  color: var(--red);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.controls-detail-row>span {
+  align-items: center;
+  background: #fff1f0;
+  border-radius: 5px;
+  color: var(--red);
+  display: inline-flex;
+  font-size: 9px;
+  height: 22px;
+  justify-content: center;
+  width: 22px;
+}
+
+.controls-detail-row div {
+  display: grid;
+  min-width: 0;
+}
+
+.controls-detail-row b {
+  color: var(--ink);
+  font-size: 9px;
+  line-height: 1.1;
+}
+
+.controls-detail-row small {
+  color: #58647a;
+  font-size: 8px;
+  line-height: 1.1;
+}
+
+.controls-detail-kpi footer {
+  border-top: 1px solid var(--line);
+  color: var(--green);
+  flex: 0 0 auto;
+  font-size: 9px;
+  font-weight: 800;
+  padding-top: 5px;
+}
+
+/* Give Fatality Prevention's enhanced KPI row enough room for 1–2 evidence rows. */
+.main-column:has(.controls-detail-kpi)>.kpis {
+  margin-bottom: 14px;
+}
+
+.main-column:has(.controls-detail-kpi)>.kpis>.kpi {
+  height: 226px;
+  min-height: 226px;
+}
+
+.main-column:has(.controls-detail-kpi)>.kpis>.controls-detail-kpi {
+  padding: 10px 18px 8px;
+}
+
+.controls-detail-kpi h3 {
+  font-size: 12px;
+}
+
+.controls-detail-kpi>strong {
+  font-size: 25px;
+  line-height: 1;
+  margin-top: 4px;
+}
+
+.controls-detail-kpi>p {
+  font-size: 9px;
+  padding-bottom: 4px;
+}
+
+.controls-detail-kpi .kpi-icon {
+  font-size: 32px;
+  top: 21px;
+}
+
+.controls-detail-list {
+  flex: 0 0 104px;
+  min-height: 104px;
+}
+
 .card,.kpi {
   background: #fff;
   border: 1px solid var(--line);

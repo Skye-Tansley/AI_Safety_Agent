@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { DashboardFilters } from './components/layout/DashboardFilters'
 import { CcfvTable, FocusTable, LifTable } from './components/dashboard/PlanTables'
+import { FatalityMetricCards } from './components/dashboard/FatalityMetricCards'
 import type { AppRole, DashboardFilters as FilterState, DashboardPage as Page, PlanView } from './types/dashboard'
 import './App.css'
 
@@ -122,6 +123,22 @@ function App() {
       if (tiles) tiles.innerHTML = `<section class="lif-visuals"><article class="card lif-tile"><h3>Top LiF Themes <small>(This Month)</small><em>View all →</em></h3><div class="lif-bars">${themes.map(([label, amount, direction]) => `<p><span>${label}</span><b style="width:${Number(amount) * 2.1}%"></b><strong>${amount}%</strong><i class="${direction}">${direction === 'up' ? '↑' : direction === 'down' ? '↓' : '–'}</i></p>`).join('')}</div><div class="lif-axis">0%　　 10%　　 20%　　 30%　　 40%</div></article><article class="card lif-tile activity-tile"><h3>Team Activity Completion <small>(This Month)</small></h3><div class="activity-content"><div>${activities.map(([label, amount]) => `<p><span>◇</span>${label}<b>${amount}</b><i>✓</i></p>`).join('')}</div><div class="completion-ring"><b>${supervisor ? '76%' : '81%'}</b><small>Complete</small></div></div></article><article class="card lif-tile risk-tile"><h3>Emerging Risks <small>ⓘ</small><em>View all →</em></h3><div class="risk-head"><span>Trend</span><span>PEPPO</span><span>Recommended Focus</span></div>${risks.map(([name, focus, priority], index) => `<div class="risk-row"><small class="risk-tag">${index === 1 ? 'Escalating' : 'New'}</small><b>${name}</b><i>↑</i><em>${priority}</em><span>${focus}</span></div>`).join('')}</div></article></section>`
     }
     if (page === 'Fatality Prevention') {
+      // Upgrade only the existing Controls tile. Its outer card remains in the
+      // original KPI grid, so this cannot move the plan table below it.
+      const controlsCard = document.querySelector<HTMLElement>('.main-column > .kpis > .kpi:first-child')
+      if (controlsCard) {
+        const controlDetails = [
+          ['Isolation Procedure Compliance', 'Control Health 61%', 'L'], ['Vehicle Exclusion Zones', 'Control Health 64%', 'V'],
+          ['Zero-energy Verification', 'Control Health 67%', 'E'], ['Working at Heights Planning', 'Control Health 69%', 'H'],
+          ['PPE Selection and Use', 'Control Health 70%', 'P'], ['Permit to Work Accuracy', 'Control Health 72%', 'T'],
+          ['Line of Fire Awareness', 'Control Health 73%', 'O'], ['Lifting Equipment Inspections', 'Control Health 74%', 'I'],
+          ['Confined Space Gas Testing', 'Control Health 75%', 'G'], ['Mobile Equipment Pre-starts', 'Control Health 76%', 'M'],
+          ['Haul-road Segregation Controls', 'Control Health 77%', 'R'], ['Electrical Isolation Records', 'Control Health 78%', 'D'],
+          ['Dropped-object Prevention', 'Control Health 79%', 'F'], ['Emergency Response Readiness', 'Control Health 80%', 'R'],
+        ]
+        controlsCard.className = 'kpi controls-detail-kpi'
+        controlsCard.innerHTML = `<h3>Controls Requiring Attention <i>ⓘ</i></h3><strong>14</strong><span class="kpi-icon">◌</span><p>Degrading Controls</p><div class="controls-detail-list" tabindex="0" aria-label="14 degrading controls">${controlDetails.map(([name, health, badge]) => `<div class="controls-detail-row"><i>•</i><span>${badge}</span><div><b>${name}</b><small>${health}</small></div><em>↓</em></div>`).join('')}</div><footer>↑ &nbsp;4 since last month</footer>`
+      }
       const tiles = document.querySelector<HTMLElement>('.main-column .bottom-cards')
       const controls = [['Isolation Procedure Followed','Degrading','32%','↑'],['Verification of Isolation','At Risk','10%','↑'],['Isolation Devices Applied','Stable','8%','↓'],['Lock / Tag Compliance','Degrading','25%','↑'],['Residual Energy Check','Stable','5%','↓']]
       const coverage = [['Energy Isolation','80%','20%'],['Working at Heights','62%','38%'],['Mobile Equipment','74%','6%'],['Line of Fire','64%','16%'],['Confined Space','61%','19%'],['Crane Operations','58%','22%'],['Excavation','41%','39%']]
@@ -134,7 +151,7 @@ function App() {
     }
     if (page === 'Leadership in the Field' && role === 'superintendent') {
       const emergingTile = document.querySelector<HTMLElement>('.lif-blank-tile')
-      if (emergingTile) emergingTile.innerHTML = `<div class="emerging-heading"><h3>Emerging Behavioural Themes <small>(This Month) ⓘ</small></h3><small>Early signals to coach in the field</small></div><div class="emerging-mini-row violet"><span>♧</span><div><b>Glove Compliance</b><small>Gloves not worn during maintenance</small></div><em>Workshop<br/>Fixed Plant</em><strong>↑ 18%</strong></div><div class="emerging-mini-row orange"><span>♙</span><div><b>Line of Fire Awareness</b><small>Exclusion-zone controls not followed</small></div><em>ROM Pad<br/>Crushing Plant</em><strong>↑ 14%</strong></div><div class="emerging-mini-row teal"><span>▧</span><div><b>PTHA Quality</b><small>Generic hazards and weak evidence</small></div><em>Processing Plant<br/>Maintenance</em><strong>↑ 11%</strong></div><div class="emerging-mini-row blue"><span>◌</span><div><b>Follow-up Conversations</b><small>Actions closed without verification</small></div><em>All Areas<br/>Multiple Teams</em><strong>↑ 8%</strong></div><button>AI Summary　 ·　 Learn more →</button>`
+      if (emergingTile) emergingTile.innerHTML = `<div class="emerging-heading"><h3>Emerging Themes <small>(This Month) ⓘ</small></h3><small>Early signals to coach in the field</small></div><div class="emerging-mini-row violet"><span>♧</span><div><b>Glove Compliance</b><small>Gloves not worn during maintenance</small></div><em>Workshop<br/>Fixed Plant</em><strong>↑ 18%</strong></div><div class="emerging-mini-row orange"><span>♙</span><div><b>Line of Fire Awareness</b><small>Exclusion-zone controls not followed</small></div><em>ROM Pad<br/>Crushing Plant</em><strong>↑ 14%</strong></div><div class="emerging-mini-row teal"><span>▧</span><div><b>PTHA Quality</b><small>Generic hazards and weak evidence</small></div><em>Processing Plant<br/>Maintenance</em><strong>↑ 11%</strong></div><div class="emerging-mini-row blue"><span>◌</span><div><b>Follow-up Conversations</b><small>Actions closed without verification</small></div><em>All Areas<br/>Multiple Teams</em><strong>↑ 8%</strong></div><button>AI Summary　 ·　 Learn more →</button>`
       document.querySelectorAll<HTMLButtonElement>('.superintendent-lif-visuals button').forEach(configureTileFooter)
     }
     const member = filters.member
@@ -186,6 +203,7 @@ function App() {
         <div className="kpis">{(lif ? [['Achieved LiF Interactions','142','18%'],['Quality Interactions','74%','6%'],['Team Members Reached','56','12%']] : [['Controls Requiring Attention','14','4 since last month'],['Emerging Risks','3','2 New  •  1 Escalating'],['AI Focus Areas','3','2 High  •  1 Medium']]).map((k,i) => <article className="kpi" key={k[0]}><h3>{k[0]}</h3><strong>{k[1]}</strong><span className="kpi-icon">{['◌','◉','♧'][i]}</span><p>{lif ? 'This Month' : ['Degrading Controls','Emerging Risks','High Priority'][i]}</p><small className="up">↑ &nbsp;{k[2]} {lif ? 'vs last month' : ''}</small>{lif && i < 2 && <div className="spark">⌁⌁⌁⌁⌁⌁⌁</div>}</article>)}</div>
         <section className="card plan"><h2>{lif ? 'LiF Plan – ' + (plan === 'Team Focus' ? 'Team Focus Areas' : 'Recommended Interactions') : 'Recommended Assurance Focus – May 2026'} <i>ⓘ</i></h2><div className="tabs">{(lif ? ['LIF Plan','Team Focus'] : ['CCVS Plan','CCFV Plan']).map(x => <button key={x} className={(plan === x || (x === 'LIF Plan' && plan !== 'Team Focus')) ? 'selected' : ''} onClick={() => setPlan(x as PlanView)}>{x}</button>)}</div>{lif ? <LifTable rows={plan === 'Team Focus' ? [] : lifRows} teamFocus={plan === 'Team Focus'} /> : plan === 'CCFV Plan' ? <CcfvTable/> : <FocusTable rows={focusRows} />}<button className="link-button">{lif ? (plan === 'Team Focus' ? 'View all supervisors  →' : 'View full plan  →') : plan === 'CCFV Plan' ? 'View full CCFV plan  →' : 'View full CCVS plan  →'}</button></section>
         <BottomCards lif={lif}/>
+        {!lif && <FatalityMetricCards />}
       </section><AiPanel lif={lif} onSend={() => { if (message.trim()) setMessage('AI response: Start with the highest-priority field verification and document follow-up actions within 7 days.'); }}/></div>}
     </main>
     {message && <div className="toast">{message}<button onClick={() => setMessage('')}>×</button></div>}
