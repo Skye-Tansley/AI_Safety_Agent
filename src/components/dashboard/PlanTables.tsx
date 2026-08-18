@@ -1,7 +1,16 @@
 /** Table variants used by the Fatality Prevention and LiF plans. */
 
+/**
+ * Superintendent CCVS plan. HSEC-scheduled items are intentionally pinned to
+ * the top, ahead of AI-only recommendations for the selected month.
+ */
 export function FocusTable({ rows }: { rows: string[][] }) {
-  return <div className="table"><div className="thead focus-head"><span>Priority</span><span>Focus Area</span><span>Trend<br /><small>vs last month</small></span><span>Location / Area</span><span>Why Recommended</span></div>{rows.map((row, index) => <div className="trow focus-row" key={row[0]}><b className={`rank r${index}`}>{index + 1}</b><div><strong>{row[0]}</strong><small>{row[1]}</small></div><span className="up">↑<small>{22 - index * 3}%<br />Worsening</small></span><span>{row[2]}</span><span>{row[3]}</span></div>)}</div>
+  const scheduledPlanNames = new Set(['Energy Isolation', 'Working at Heights'])
+  const orderedRows = [...rows.filter(row => scheduledPlanNames.has(row[0])), ...rows.filter(row => !scheduledPlanNames.has(row[0]))]
+  return <div className="table"><div className="thead focus-head"><span>Priority</span><span>Focus Area</span><span>Trend<br /><small>vs last month</small></span><span>Location / Area</span><span>Why Recommended</span></div>{orderedRows.map((row, index) => {
+    const isScheduled = scheduledPlanNames.has(row[0])
+    return <div className={`trow focus-row ${isScheduled ? 'focus-row--scheduled' : ''}`} key={row[0]}><b className={`rank r${index}`}>{index + 1}</b><div><strong>{row[0]}</strong>{isScheduled && <span className="scheduled-plan-flag">⚑ HSEC scheduled plan</span>}<small>{row[1]}</small></div><span className="up">↑<small>{22 - index * 3}%<br />Worsening</small></span><span>{row[2]}</span><span>{row[3]}</span></div>
+  })}</div>
 }
 
 export function CcfvTable() {

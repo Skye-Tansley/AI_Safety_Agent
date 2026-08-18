@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { DashboardFilters } from './components/layout/DashboardFilters'
 import { CcfvTable, FocusTable, LifTable } from './components/dashboard/PlanTables'
 import { FatalityMetricCards } from './components/dashboard/FatalityMetricCards'
+import { HsecPlanningCoveragePage } from './pages/HsecPlanningCoveragePage'
 import type { AppRole, DashboardFilters as FilterState, DashboardPage as Page, PlanView } from './types/dashboard'
 import './App.css'
 
@@ -31,7 +32,7 @@ const lifRows = [
 const baseFocusRows = focusRows.map(row => [...row])
 const baseLifRows = lifRows.map(row => [...row])
 
-function createDemoData(filters: FilterState, role: 'superintendent' | 'supervisor') {
+function createDemoData(filters: FilterState, role: AppRole) {
   const signature = `${filters.site}|${filters.department}|${filters.team}|${filters.member}|${filters.from}|${filters.to}`
   const seed = [...signature].reduce((total, character) => total + character.charCodeAt(0), 0)
   const scope = role === 'supervisor' ? (filters.member || filters.team || 'Tom Kelly’s team') : (filters.member || filters.team || filters.department || (filters.site === 'All Pilbara sites' ? 'all Pilbara operations' : filters.site))
@@ -64,10 +65,26 @@ function App() {
     }
     document.body.dataset.role = role
     document.body.dataset.page = page
+    const hsecNavigation = document.querySelector<HTMLElement>('[data-hsec-navigation]')
+    hsecNavigation?.remove()
+    if (role === 'hsec') {
+      const sidebar = document.querySelector<HTMLElement>('.sidebar')
+      const collapseButton = sidebar?.querySelector<HTMLElement>('.collapse')
+      const planningButton = document.createElement('button')
+      planningButton.className = page === 'CCVS Planning & Coverage' ? 'nav active' : 'nav'
+      planningButton.dataset.hsecNavigation = 'true'
+      planningButton.innerHTML = '<span>▦</span>CCVS Planning & Coverage'
+      planningButton.addEventListener('click', () => setPage('CCVS Planning & Coverage'))
+      if (sidebar && collapseButton) sidebar.insertBefore(planningButton, collapseButton)
+    }
     const profile = document.querySelector<HTMLElement>('.user')
     const avatar = document.querySelector<HTMLElement>('.avatar')
-    if (profile) profile.innerHTML = role === 'supervisor' ? 'Tom Kelly<small>Supervisor</small>' : 'Jane Smith<small>Superintendent</small>'
-    if (avatar) avatar.textContent = role === 'supervisor' ? 'TK' : 'JS'
+    if (profile) profile.innerHTML = role === 'supervisor' ? 'Tom Kelly<small>Supervisor</small>' : role === 'hsec' ? 'Alex Brooks<small>HSEC Advisor</small>' : 'Jane Smith<small>Superintendent</small>'
+    if (avatar) avatar.textContent = role === 'supervisor' ? 'TK' : role === 'hsec' ? 'AB' : 'JS'
+    if (role === 'hsec' && page === 'CCVS Planning & Coverage') {
+      const subtitle = document.querySelector<HTMLElement>('.page-heading p')
+      if (subtitle) subtitle.textContent = 'Plan and monitor monthly CCVS verification coverage across leaders, critical risks and controls.'
+    }
     const supervisorLifValues = ['42', '72%', '24 / 30']
     const superintendentLifValues = ['142', '74%', '56']
     if (page === 'Leadership in the Field') document.querySelectorAll<HTMLElement>('.kpi strong').forEach((item, index) => { item.textContent = (role === 'supervisor' ? supervisorLifValues : superintendentLifValues)[index] })
@@ -95,6 +112,12 @@ function App() {
         const frequency = row.children[6]?.querySelector('small')
         if (frequency) frequency.textContent = activity[5]
       })
+    }
+    if (role === 'superintendent' && page === 'Fatality Prevention') {
+      const heading = document.querySelector<HTMLElement>('.plan h2')
+      if (heading && plan === 'CCVS Plan') {
+        heading.innerHTML = `<span class="ccvs-plan-title">Recommended Assurance Focus – May 2026 <i>ⓘ</i></span><span class="ccvs-progress" aria-label="5 of 8 CCVS activities completed; 1 of 2 HSEC scheduled activities completed"><span class="ccvs-progress__summary"><b>5 / 8</b> completed this month</span><span class="ccvs-progress__bar"><i class="ccvs-progress__completed" title="4 self-selected activities completed"></i><i class="ccvs-progress__remaining" title="2 self-selected activities outstanding"></i><i class="ccvs-progress__scheduled-complete" title="1 HSEC scheduled activity completed"></i><i class="ccvs-progress__scheduled-remaining" title="1 HSEC scheduled activity outstanding"></i></span><span class="ccvs-progress__legend"><em class="ccvs-progress__completed">Completed</em><em class="ccvs-progress__remaining">Outstanding</em><em class="ccvs-progress__scheduled-complete">Scheduled complete</em><em class="ccvs-progress__scheduled-remaining">Scheduled outstanding</em></span></span>`
+      }
     }
     if (page === 'Insight Explorer') {
       const mainColumn = document.querySelector<HTMLElement>('.spotlight .main-column')
@@ -196,15 +219,16 @@ function App() {
   return <div className="app-shell">
     <header className="topbar"><div className="rio">RioTinto</div><div className="product"><span>⬡</span> Safety AI Agent</div><div className="top-actions"><button className="bell">♧<b>3</b></button><button className="ask">⇧ &nbsp; Ask AI</button><span className="avatar">JS</span><span className="user">Jane Smith<small>Superintendent</small></span></div></header>
     <aside className="sidebar">{nav.map(item => <button key={item.label} className={page === item.label ? 'nav active' : 'nav'} onClick={() => setPage(item.label)}><span>{item.icon}</span>{item.label}</button>)}<button className="collapse">≪ &nbsp; Collapse</button></aside>
-    <button className="role-switch" onClick={() => { const nextRole = role === 'superintendent' ? 'supervisor' : 'superintendent'; setRole(nextRole); setPlan(nextRole === 'supervisor' ? 'CCFV Plan' : 'CCVS Plan') }} title={role === 'superintendent' ? 'Switch to Supervisor view' : 'Switch to Superintendent view'} aria-label="Switch view">⌄</button>
+    <button className="role-switch" onClick={() => { const nextRole: AppRole = role === 'superintendent' ? 'supervisor' : role === 'supervisor' ? 'hsec' : 'superintendent'; setRole(nextRole); setPlan(nextRole === 'supervisor' ? 'CCFV Plan' : 'CCVS Plan'); if (nextRole === 'hsec') setPage('CCVS Planning & Coverage') }} title="Switch user view" aria-label="Switch user view">⌄</button>
     <main>
       <section className="page-heading"><div><h1>{title} <i>ⓘ</i></h1><p>{subtitle}</p></div><DashboardFilters value={filters} onChange={setFilters}/><button className="outline">⇧ &nbsp; Export Plan</button><button className="primary" onClick={() => setMessage('Plan regenerated with the latest available safety insights.')}>⟳ &nbsp; Regenerate Plan</button></section>
       {spotlight ? <Spotlight onAsk={() => setMessage('Ask AI is ready to help you explore the spotlight recommendations.')} /> : <div className="content-grid"><section className="main-column">
         <div className="kpis">{(lif ? [['Achieved LiF Interactions','142','18%'],['Quality Interactions','74%','6%'],['Team Members Reached','56','12%']] : [['Controls Requiring Attention','14','4 since last month'],['Emerging Risks','3','2 New  •  1 Escalating'],['AI Focus Areas','3','2 High  •  1 Medium']]).map((k,i) => <article className="kpi" key={k[0]}><h3>{k[0]}</h3><strong>{k[1]}</strong><span className="kpi-icon">{['◌','◉','♧'][i]}</span><p>{lif ? 'This Month' : ['Degrading Controls','Emerging Risks','High Priority'][i]}</p><small className="up">↑ &nbsp;{k[2]} {lif ? 'vs last month' : ''}</small>{lif && i < 2 && <div className="spark">⌁⌁⌁⌁⌁⌁⌁</div>}</article>)}</div>
-        <section className="card plan"><h2>{lif ? 'LiF Plan – ' + (plan === 'Team Focus' ? 'Team Focus Areas' : 'Recommended Interactions') : 'Recommended Assurance Focus – May 2026'} <i>ⓘ</i></h2><div className="tabs">{(lif ? ['LIF Plan','Team Focus'] : ['CCVS Plan','CCFV Plan']).map(x => <button key={x} className={(plan === x || (x === 'LIF Plan' && plan !== 'Team Focus')) ? 'selected' : ''} onClick={() => setPlan(x as PlanView)}>{x}</button>)}</div>{lif ? <LifTable rows={plan === 'Team Focus' ? [] : lifRows} teamFocus={plan === 'Team Focus'} /> : plan === 'CCFV Plan' ? <CcfvTable/> : <FocusTable rows={focusRows} />}<button className="link-button">{lif ? (plan === 'Team Focus' ? 'View all supervisors  →' : 'View full plan  →') : plan === 'CCFV Plan' ? 'View full CCFV plan  →' : 'View full CCVS plan  →'}</button></section>
+        <section className="card plan"><h2>{lif ? 'LiF Plan – ' + (plan === 'Team Focus' ? 'Team Focus Areas' : 'Recommended Interactions') : 'Recommended Assurance Focus – May 2026'} <i>ⓘ</i></h2><div className="tabs">{(lif ? ['LIF Plan','Team Focus'] : ['CCVS Plan','CCFV Plan']).map(x => <button key={x} className={(plan === x || (x === 'LIF Plan' && plan !== 'Team Focus')) ? 'selected' : ''} onClick={() => setPlan(x as PlanView)}>{x}</button>)}</div>{lif ? <LifTable rows={plan === 'Team Focus' ? [] : lifRows} teamFocus={plan === 'Team Focus'} /> : plan === 'CCFV Plan' ? <CcfvTable/> : <FocusTable rows={focusRows} />}</section>
         <BottomCards lif={lif}/>
         {!lif && <FatalityMetricCards />}
       </section><AiPanel lif={lif} onSend={() => { if (message.trim()) setMessage('AI response: Start with the highest-priority field verification and document follow-up actions within 7 days.'); }}/></div>}
+      {role === 'hsec' && page === 'CCVS Planning & Coverage' && <HsecPlanningCoveragePage filters={filters} />}
     </main>
     {message && <div className="toast">{message}<button onClick={() => setMessage('')}>×</button></div>}
   </div>

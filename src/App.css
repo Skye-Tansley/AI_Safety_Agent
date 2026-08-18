@@ -691,6 +691,21 @@ main {
   color: var(--red)
 }
 
+/* HSEC monthly plans are elevated above AI-only recommendations in the CCVS table. */
+.focus-row--scheduled {
+  background: #fffdfb;
+}
+
+.scheduled-plan-flag {
+  color: #c61f18;
+  display: inline-block;
+  font-size: 8px;
+  font-weight: 800;
+  margin-left: 6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 .link-button {
   border: 0;
   background: none;
@@ -2520,4 +2535,383 @@ body[data-page="Fatality Prevention"] .main-column .bottom-cards {
   margin-top: auto;
   padding: 6px;
   width: 100%
+}
+
+/* Superintendent CCVS monthly completion: 6 self-selected + 2 HSEC-scheduled activities. */
+.plan h2:has(.ccvs-progress) {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+}
+
+.ccvs-plan-title {
+  flex: 0 1 auto;
+}
+
+.ccvs-plan-title i {
+  color: #68748a;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.ccvs-progress {
+  align-items: center;
+  display: grid;
+  gap: 3px 7px;
+  grid-template-columns: auto 126px;
+  min-width: 310px;
+}
+
+.ccvs-progress__summary {
+  color: #49556a;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.ccvs-progress__summary b {
+  color: var(--ink);
+  font-size: 11px;
+}
+
+.ccvs-progress__bar {
+  background: #edf0f4;
+  border-radius: 999px;
+  display: flex;
+  height: 8px;
+  overflow: hidden;
+}
+
+.ccvs-progress__bar i {
+  display: block;
+  height: 100%;
+}
+
+.ccvs-progress__bar .ccvs-progress__completed { background: #16845d; flex: 4; }
+.ccvs-progress__bar .ccvs-progress__remaining { background: #cbd2dc; flex: 2; }
+.ccvs-progress__bar .ccvs-progress__scheduled-complete { background: #283a72; flex: 1; }
+.ccvs-progress__bar .ccvs-progress__scheduled-remaining { background: #ed8d20; flex: 1; }
+
+.ccvs-progress__legend {
+  display: flex;
+  gap: 7px;
+  grid-column: 1 / -1;
+}
+
+.ccvs-progress__legend em {
+  align-items: center;
+  color: #5f6a7e;
+  display: inline-flex;
+  font-size: 7px;
+  font-style: normal;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ccvs-progress__legend em::before {
+  background: currentColor;
+  border-radius: 50%;
+  content: '';
+  display: inline-block;
+  height: 5px;
+  margin-right: 3px;
+  width: 5px;
+}
+
+.ccvs-progress__legend .ccvs-progress__completed { color: #16845d; }
+.ccvs-progress__legend .ccvs-progress__remaining { color: #8b96a6; }
+.ccvs-progress__legend .ccvs-progress__scheduled-complete { color: #283a72; }
+.ccvs-progress__legend .ccvs-progress__scheduled-remaining { color: #d97716; }
+
+/* HSEC-only annual CCVS planning and coverage view. */
+body[data-role="hsec"][data-page="CCVS Planning & Coverage"] main>.content-grid {
+  display: none;
+}
+
+/* Keep the advisor view within the desktop viewport; the long schedule scrolls internally. */
+body[data-role="hsec"][data-page="CCVS Planning & Coverage"] main {
+  height: calc(100vh - 48px);
+  overflow: hidden;
+}
+
+.hsec-coverage {
+  margin-top: 12px;
+}
+
+/* The HSEC advisor page keeps planning data and AI guidance side by side. */
+.hsec-coverage-layout {
+  align-items: start;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 2.35fr) minmax(285px, .8fr);
+  margin-top: 12px;
+  height: calc(100vh - 180px);
+  min-height: 0;
+}
+
+.hsec-coverage-layout .hsec-coverage {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin-top: 0;
+  min-height: 0;
+}
+
+.hsec-ai-panel {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 12px;
+}
+
+.hsec-ai-panel__heading {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 9px;
+}
+
+.hsec-ai-panel__heading h2 {
+  color: var(--ink);
+  font-size: 13px;
+  margin: 0;
+}
+
+.hsec-ai-panel__heading>span {
+  color: #71809a;
+  font-size: 19px;
+}
+
+.hsec-ai-recommendation {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 22px 1fr;
+  padding: 12px 0;
+}
+
+.hsec-ai-recommendation+ .hsec-ai-recommendation {
+  border-top: 1px solid var(--line);
+}
+
+.hsec-ai-recommendation>span {
+  align-items: center;
+  background: #f5f0ff;
+  border-radius: 6px;
+  color: #7b4fe5;
+  display: inline-flex;
+  font-size: 13px;
+  height: 22px;
+  justify-content: center;
+  width: 22px;
+}
+
+.hsec-ai-recommendation h3,
+.hsec-ai-chat h3 {
+  color: var(--ink);
+  font-size: 10px;
+  margin: 0 0 4px;
+}
+
+.hsec-ai-recommendation p,
+.hsec-ai-chat>p {
+  color: #59657a;
+  font-size: 8px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.hsec-ai-callout {
+  background: #fff7f7;
+  border: 1px solid #f6dbde;
+  border-radius: 6px;
+  color: #b4232d;
+  font-size: 9px;
+  margin: 2px 0 12px;
+  padding: 9px;
+}
+
+.hsec-ai-callout p {
+  color: #5c6474;
+  font-size: 8px;
+  line-height: 1.4;
+  margin: 4px 0 0;
+}
+
+.hsec-ai-chat {
+  border-top: 1px solid var(--line);
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.hsec-ai-chat>p { margin-bottom: 8px; }
+
+.hsec-ai-chat form {
+  display: flex;
+  margin-top: 8px;
+}
+
+.hsec-ai-chat input {
+  border: 1px solid #dce2eb;
+  border-radius: 5px 0 0 5px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 9px;
+  min-width: 0;
+  padding: 8px;
+  width: 100%;
+}
+
+.hsec-ai-chat form button {
+  background: #26365f;
+  border: 0;
+  border-radius: 0 5px 5px 0;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0 10px;
+}
+
+.hsec-ai-answer {
+  background: #f2f6ff;
+  border: 1px solid #dae5fa;
+  border-radius: 5px;
+  color: #43546f;
+  font-size: 8px;
+  line-height: 1.45;
+  margin-top: 8px;
+  padding: 8px;
+}
+
+.hsec-ai-prompts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.hsec-ai-prompts button {
+  background: #fff;
+  border: 1px solid #dce2eb;
+  border-radius: 4px;
+  color: #4c5c78;
+  cursor: pointer;
+  font-size: 8px;
+  padding: 6px;
+}
+
+.hsec-metrics {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.hsec-metric {
+  align-items: center;
+  display: flex;
+  gap: 9px;
+  min-height: 66px;
+  padding: 10px;
+}
+
+.hsec-metric>span {
+  align-items: center;
+  background: #f0edff;
+  border-radius: 50%;
+  color: #6743d6;
+  display: inline-flex;
+  font-size: 18px;
+  height: 30px;
+  justify-content: center;
+  width: 30px;
+}
+
+.hsec-metric--green>span { background: #eaf8f1; color: #138a5b; }
+.hsec-metric--blue>span { background: #eaf3ff; color: #2c6ecb; }
+.hsec-metric--orange>span { background: #fff3e7; color: #d97716; }
+.hsec-metric--red>span { background: #fff0f0; color: #d93025; }
+
+.hsec-metric small,.hsec-metric p { display: block; font-size: 8px; margin: 0; }
+.hsec-metric small { color: #48546a; font-weight: 700; }
+.hsec-metric strong { color: var(--ink); display: block; font-size: 20px; line-height: 1.1; margin: 3px 0; }
+.hsec-metric p { color: #657187; }
+
+.hsec-schedule-card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.hsec-schedule-card__header {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 14px;
+}
+
+.hsec-schedule-card__header h2 { font-size: 14px; margin: 0; }
+.hsec-schedule-card__header p { color: #68748a; font-size: 9px; margin: 3px 0 0; }
+
+.hsec-legend {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 8px 14px;
+}
+
+.hsec-legend span { color: #657187; font-size: 8px; font-weight: 700; }
+.hsec-legend .completed { color: #16845d; }
+.hsec-legend .current { color: #d97716; }
+.hsec-legend .planned { color: #217348; }
+.hsec-legend .missed { color: #d93025; }
+.hsec-legend .unplanned { color: #8b96a6; }
+
+.hsec-table-wrap { flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; }
+
+/* Compact fixed columns keep the full annual schedule visible without a horizontal scrollbar. */
+.hsec-table { border-collapse: collapse; font-size: 7px; table-layout: fixed; width: 100%; }
+.hsec-table th { background: #f8f9fb; color: #25324b; font-size: 7px; line-height: 1.15; padding: 7px 3px; text-align: left; white-space: normal; }
+.hsec-table td { border-top: 1px solid #edf0f4; color: #536078; line-height: 1.2; overflow-wrap: anywhere; padding: 5px 3px; vertical-align: middle; }
+.hsec-table th:nth-child(1),.hsec-table td:nth-child(1) { width: 9%; }
+.hsec-table th:nth-child(2),.hsec-table td:nth-child(2) { width: 12%; }
+.hsec-table th:nth-child(3),.hsec-table td:nth-child(3) { width: 7%; }
+.hsec-table th:nth-child(4),.hsec-table td:nth-child(4) { width: 7%; }
+.hsec-table th:nth-child(5),.hsec-table td:nth-child(5) { width: 9%; }
+.hsec-table th:nth-child(6),.hsec-table td:nth-child(6) { width: 7%; }
+.hsec-table th:nth-child(7),.hsec-table td:nth-child(7) { width: 9%; }
+.hsec-table td:first-child { color: var(--ink); font-weight: 700; }
+.hsec-table th:nth-child(n+8),.hsec-table td:nth-child(n+8) { text-align: center; width: 3.3%; }
+.hsec-table .current-month { background: #fff7e8; }
+
+.verification { border-radius: 3px; display: inline-block; font-size: 7px; font-weight: 700; padding: 2px 4px; }
+.verification--design { background: #fff0f4; color: #d54970; }
+.verification--implementation { background: #edf4ff; color: #3977d8; }
+.verification--training { background: #f2eeff; color: #7252cc; }
+
+.schedule-status { font-size: 11px; font-weight: 800; }
+.schedule-status--completed { color: #16845d; }
+.schedule-status--current { color: #d97716; }
+.schedule-status--planned { color: #217348; }
+.schedule-status--missed { color: #d93025; }
+.schedule-status--unplanned { color: #9aa4b5; }
+
+.hsec-schedule-card__footer { border-top: 1px solid var(--line); color: #6a7588; font-size: 8px; margin-top: auto; padding: 8px 14px; }
+
+@media(max-width:1250px) {
+  .hsec-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hsec-coverage-layout { height: auto; grid-template-columns: 1fr; }
+  body[data-role="hsec"][data-page="CCVS Planning & Coverage"] main { height: auto; overflow: visible; }
+}
+
+/* Tables already present their full datasets in this prototype; no drill-down links are needed. */
+.plan>.link-button,
+.spotlight .plan>.link-button {
+  display: none;
 }

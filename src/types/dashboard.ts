@@ -3,13 +3,14 @@
  * Keep backend-shaped data types here rather than in React components.
  */
 
-export type AppRole = 'superintendent' | 'supervisor'
+export type AppRole = 'superintendent' | 'supervisor' | 'hsec'
 
 export type DashboardPage =
   | 'Fatality Prevention'
   | 'Leadership in the Field'
   | 'Insight Explorer'
   | 'Spotlight Recommendations'
+  | 'CCVS Planning & Coverage'
 
 export type PlanView = 'CCVS Plan' | 'CCFV Plan' | 'LIF Plan' | 'Team Focus'
 
